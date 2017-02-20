@@ -48,7 +48,7 @@ int main(int argc, char** argv)
     std::unique_ptr<rocksdb::DB> dbptr(db); // for deletion
     rocksdb::ReadOptions roptions;
     rocksdb::WriteOptions woptions;
-    populate(db, 5000000);
+    populate(db, 12500000);
     auto begin = Clock::now();
     std::unique_ptr<rocksdb::Iterator> iter(db->NewIterator(roptions));
     int32_t max = std::numeric_limits<int32_t>::min();
