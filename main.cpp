@@ -1,4 +1,5 @@
 #include <rocksdb/db.h>
+#include <rocksdb/table.h>
 #include <iostream>
 #include <random>
 #include <cstdint>
@@ -40,13 +41,24 @@ using Clock = std::chrono::steady_clock;
 
 int main(int argc, char** argv)
 {
+    std::string dbPath = "/tmp/db";
+    if (argc > 1 )
+    	dbPath = argv[1];
     rocksdb::DB* db;
     rocksdb::Options options;
     options.create_if_missing = true;
     options.error_if_exists = true;
-    status(rocksdb::DB::Open(options, "/tmp/db", &db));
+    options.allow_mmap_reads = true;
+    options.compression = rocksdb::CompressionType::kNoCompression;
+    options.target_file_size_base = 256 * 1024 * 1024;
+
+    std::cout<< "Using database in " << dbPath << std::endl;
+    status(rocksdb::DB::Open(options, dbPath, &db));
     std::unique_ptr<rocksdb::DB> dbptr(db); // for deletion
     rocksdb::ReadOptions roptions;
+
+    roptions.verify_checksums = false;
+
     rocksdb::WriteOptions woptions;
     populate(db, 12500000);
     auto begin = Clock::now();
